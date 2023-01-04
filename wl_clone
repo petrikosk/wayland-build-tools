@@ -9,7 +9,12 @@
 
 clone_or_update() {
 	repo=$1
-	dest=$(basename $repo)
+	if [ -z "$2" ]
+  	then
+		dest=$(basename $repo)
+	else
+		dest=$2
+	fi
 
 	cd ${WLROOT}
 	if [ $? != 0 ]; then
@@ -26,11 +31,11 @@ clone_or_update() {
 		fi
 	fi
 	cd ${dest}
-	if [[ $dest == 'mesa' ]]
-	then
-		git checkout main
-	else
+	if [ -z "$3" ]
+  	then
 		git checkout master
+	else
+		git checkout $3
 	fi
 
 	if [ $? != 0 ]; then
@@ -45,8 +50,8 @@ clone_or_update() {
 	cd ${WLROOT}
 }
 
-clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxau.git
-clone_or_update git://anongit.freedesktop.org/wayland/wayland
+clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxau.git libxau
+clone_or_update git://anongit.freedesktop.org/wayland/wayland wayland 1.14
 clone_or_update git://anongit.freedesktop.org/git/mesa/drm
 clone_or_update git://anongit.freedesktop.org/xcb/proto
 clone_or_update git://anongit.freedesktop.org/xorg/util/macros
@@ -54,8 +59,8 @@ clone_or_update git://anongit.freedesktop.org/xcb/libxcb
 clone_or_update git://anongit.freedesktop.org/xorg/proto/presentproto
 clone_or_update git://anongit.freedesktop.org/xorg/proto/dri3proto
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
-clone_or_update https://github.com/xkbcommon/libxkbcommon.git
-clone_or_update git://anongit.freedesktop.org/mesa/mesa
+clone_or_update https://github.com/xkbcommon/libxkbcommon.git libxkbcommon
+clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa main
 clone_or_update git://anongit.freedesktop.org/pixman
 clone_or_update git://anongit.freedesktop.org/cairo
 clone_or_update git://git.sv.gnu.org/libunwind
@@ -70,7 +75,8 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 		clone_or_update git://anongit.freedesktop.org/xorg/lib/libxtrans
 	fi
 
-	clone_or_update https://github.com/anholt/libepoxy.git
+	clone_or_update https://github.com/anholt/libepoxy.git libepoxy
+	clone_or_update https://gitlab.freedesktop.org/xorg/proto/xorgproto.git xorgproto
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/glproto
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/xproto
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/xcmiscproto

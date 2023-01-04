@@ -25,6 +25,7 @@ cpp = ['aarch64-linux-gnu-g++']
 ar = ['aarch64-linux-gnu-ar']
 strip = ['aarch64-linux-gnu-strip']
 cmake = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/cmake']
-pkgconfig = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/pkg-config']
+#pkgconfig = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/pkg-config']
+pkgconfig = ['/mnt/wsl/PHYSICALDRIVE0/petri/wayland/wayland-build-tools/fix_pkg_conf_sysroot.sh']
 exe_wrapper = '/usr/bin/qemu-aarch64-static'
 

@@ -16,7 +16,8 @@ gen() {
 	echo $pkg
 	cd $WLROOT/$pkg
 	echo "./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*"
-	./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*
+	./autogen.sh $CONFIGURE_FLAGS --with-build-sysroot --prefix=$WLD $*
+	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
 gen_meson() {
@@ -27,10 +28,11 @@ gen_meson() {
 	cd $WLROOT/$pkg
 	echo "meson setup --cross-file $MESON_CROSS_FILE --prefix=$WLD $* build"
 	meson setup --cross-file $MESON_CROSS_FILE -Dprefix=$WLD $* build
+	#meson setup --cross-file $MESON_CROSS_FILE $* build
 }
 
 compile() {
-	make -j4 && make install
+	make -j16 && make install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -56,7 +58,7 @@ distcheck() {
 
 mkdir -p $WLD/share/aclocal
 
-#gen wayland --with-host-scanner
+#gen wayland --with-host-scanner --disable-documentation
 #compile
 
 #gen wayland-protocols
@@ -71,26 +73,33 @@ mkdir -p $WLD/share/aclocal
 #gen macros
 #compile
 
-gen libxau
-compile
+#gen xorgproto
+#compile
 
-gen libxcb
-compile
+#gen libxau
+#compile
 
-gen presentproto
-compile
+#gen libxcb
+#compile
 
-gen dri3proto
-compile
+#gen presentproto #DEPRECATED
+#compile
 
-gen libxshmfence
-compile
+#gen dri3proto #DEPRECATED
+#compile
 
-gen libxkbcommon \
-	--with-xkb-config-root=/usr/share/X11/xkb \
-	--with-x-locale-root=/usr/share/X11/locale \
-	--disable-x11
-compile
+#gen libxshmfence
+#compile
+
+#gen libxkbcommon \
+	#--with-xkb-config-root=/usr/share/X11/xkb \
+	#--with-x-locale-root=/usr/share/X11/locale \
+	#--disable-x11
+gen_meson libxkbcommon \
+    -Denable-x11=false \
+    -Dxkb-config-root=/usr/share/X11/xkb \
+    -Dx-locale-root=/usr/share/X11/locale
+compile_meson
 
 llvm_drivers=swrast,nouveau,r300
 vga_pci=$(lspci | grep VGA | head -n1)

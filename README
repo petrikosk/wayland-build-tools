@@ -26,6 +26,7 @@ Step 2: Prepare expected directories
         mkdir ~/Wayland # sources and builds will be here
         mkdir -p ~/.config/wayland-build-tools
         cp wl_defines.sh ~/.config/wayland-build-tools/
+        cp arm64.txt ~/Wayland/
 
 You can change these directories if you wish, but these are the defaults
 and you'll need to edit the scripts to match. See WL_ROOT and WLD in

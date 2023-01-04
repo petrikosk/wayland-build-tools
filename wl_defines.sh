@@ -15,6 +15,7 @@ export RANLIB="${TOOLCHAIN}/bin/${HOST}-ranlib"
 export STRIP="${TOOLCHAIN}/bin/${HOST}-strip"
 export CONFIGURE_FLAGS="--host=${HOST} --build=${BUILD}"
 export PKG_CONFIG_SYSROOT_DIR="${SYSROOT}"
+export PKG_CONFIG='/mnt/wsl/PHYSICALDRIVE0/petri/wayland/wayland-build-tools/fix_pkg_conf_sysroot.sh'
 export PKG_CONFIG_PATH="${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
 #export PKG_CONFIG_PATH="${SYSROOT}/lib/pkgconfig"
 
