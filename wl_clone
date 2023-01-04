@@ -26,7 +26,13 @@ clone_or_update() {
 		fi
 	fi
 	cd ${dest}
-	git checkout master
+	if [[ $dest == 'mesa' ]]
+	then
+		git checkout main
+	else
+		git checkout master
+	fi
+
 	if [ $? != 0 ]; then
 		echo "Error: Problem checking out master"
 		exit 1
@@ -39,6 +45,7 @@ clone_or_update() {
 	cd ${WLROOT}
 }
 
+clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxau.git
 clone_or_update git://anongit.freedesktop.org/wayland/wayland
 clone_or_update git://anongit.freedesktop.org/git/mesa/drm
 clone_or_update git://anongit.freedesktop.org/xcb/proto
@@ -47,7 +54,7 @@ clone_or_update git://anongit.freedesktop.org/xcb/libxcb
 clone_or_update git://anongit.freedesktop.org/xorg/proto/presentproto
 clone_or_update git://anongit.freedesktop.org/xorg/proto/dri3proto
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
-clone_or_update git://github.com/xkbcommon/libxkbcommon
+clone_or_update https://github.com/xkbcommon/libxkbcommon.git
 clone_or_update git://anongit.freedesktop.org/mesa/mesa
 clone_or_update git://anongit.freedesktop.org/pixman
 clone_or_update git://anongit.freedesktop.org/cairo
@@ -63,7 +70,7 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 		clone_or_update git://anongit.freedesktop.org/xorg/lib/libxtrans
 	fi
 
-	clone_or_update git://github.com/anholt/libepoxy
+	clone_or_update https://github.com/anholt/libepoxy.git
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/glproto
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/xproto
 	clone_or_update git://anongit.freedesktop.org/xorg/proto/xcmiscproto

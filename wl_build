@@ -15,12 +15,30 @@ gen() {
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
-	echo "./autogen.sh --prefix=$WLD $*"
-	./autogen.sh --prefix=$WLD $*
+	echo "./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*"
+	./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*
+}
+
+gen_meson() {
+	pkg=$1
+	shift
+	echo
+	echo $pkg
+	cd $WLROOT/$pkg
+	echo "meson setup --cross-file $MESON_CROSS_FILE --prefix=$WLD $* build"
+	meson setup --cross-file $MESON_CROSS_FILE -Dprefix=$WLD $* build
 }
 
 compile() {
-	make -j32 && make install
+	make -j4 && make install
+	if [ $? != 0 ]; then
+		echo "Build Error.  Terminating"
+		exit
+	fi
+}
+
+compile_meson() {
+	ninja -C build/ install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -38,19 +56,22 @@ distcheck() {
 
 mkdir -p $WLD/share/aclocal
 
-gen wayland
-compile
+#gen wayland --with-host-scanner
+#compile
 
-gen wayland-protocols
-compile
+#gen wayland-protocols
+#compile
 
-gen drm --disable-libkms
-compile
+#gen_meson drm #--disable-libkms
+#compile_meson
 
-gen proto
-compile
+#gen proto
+#compile
 
-gen macros
+#gen macros
+#compile
+
+gen libxau
 compile
 
 gen libxcb
@@ -84,6 +105,7 @@ echo "mesa"
 cd $WLROOT/mesa
 git clean -xfd
 ./autogen.sh --prefix=$WLD \
+	$CONFIGURE_FLAGS \
 	--enable-gles2 \
 	--with-egl-platforms=x11,wayland,drm \
 	--enable-gbm \
@@ -104,7 +126,7 @@ echo
 echo "libunwind"
 cd $WLROOT/libunwind
 autoreconf -i
-./configure --prefix=$WLD
+./configure $CONFIGURE_FLAGS --prefix=$WLD
 compile
 
 gen libevdev
@@ -183,7 +205,8 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	echo
 	echo "xserver"
 	cd $WLROOT/xserver
-	./autogen.sh --prefix=$WLD --disable-docs --disable-devel-docs \
+	./autogen.sh $CONFIGURE_FLAGS \
+		--prefix=$WLD --disable-docs --disable-devel-docs \
 		--enable-xwayland --disable-xorg --disable-xvfb --disable-xnest \
 		--disable-xquartz --disable-xwin
 	compile
@@ -203,7 +226,8 @@ echo
 echo "weston"
 cd $WLROOT/weston
 git clean -xfd
-./autogen.sh --prefix=$WLD \
+./autogen.sh $CONFIGURE_FLAGS \
+	--prefix=$WLD \
 	--with-cairo=image \
 	--with-xserver-path=$WLD/bin/Xwayland \
 	--enable-setuid-install=no \

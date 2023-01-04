@@ -1,0 +1,30 @@
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+#[built-in options]
+#c_args = ['-I/opt/fsl-imx-xwayland/4.14-sumo/sysroots/aarch64-poky-linux/usr/include']
+#cpp_args = []
+#objc_args = []
+#objcpp_args = []
+#c_link_args = ['-nostdlib', '-lpthread']
+#cpp_link_args = []
+#objc_link_args = []
+#objcpp_link_args = []
+
+[properties]
+pkg_config_path = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/lib/pkgconfig']
+sys_root = '/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot'
+
+
+[binaries]
+c = ['aarch64-linux-gnu-gcc']
+cpp = ['aarch64-linux-gnu-g++']
+ar = ['aarch64-linux-gnu-ar']
+strip = ['aarch64-linux-gnu-strip']
+cmake = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/cmake']
+pkgconfig = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/pkg-config']
+exe_wrapper = '/usr/bin/qemu-aarch64-static'
+
