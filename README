@@ -1,5 +1,8 @@
 Wayland Build Tools
 -------------------
+Forked from git://anongit.freedesktop.org/wayland/wayland-build-tools
+Added aarch64 cross compilation data
+
 
 These are scripts that automate the standard Wayland build and installation
 directions (http://wayland.freedesktop.org/building.html), and take care of
