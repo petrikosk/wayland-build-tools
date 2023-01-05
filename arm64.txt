@@ -15,8 +15,9 @@ endian = 'little'
 #objcpp_link_args = []
 
 [properties]
-pkg_config_path = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/lib/pkgconfig']
+pkg_config_path = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/lib/pkgconfig','/home/petri/Wayland/install/lib/pkgconfig','/home/petri/Wayland/install/share/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/lib/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/share/pkgconfig']
 sys_root = '/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot'
+wayland_scanner ='/usr/bin/wayland-scanner'
 
 
 [binaries]
@@ -24,8 +25,9 @@ c = ['aarch64-linux-gnu-gcc']
 cpp = ['aarch64-linux-gnu-g++']
 ar = ['aarch64-linux-gnu-ar']
 strip = ['aarch64-linux-gnu-strip']
-cmake = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/cmake']
-#pkgconfig = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/bin/pkg-config']
-pkgconfig = ['/mnt/wsl/PHYSICALDRIVE0/petri/wayland/wayland-build-tools/fix_pkg_conf_sysroot.sh']
+cmake = ['/usr/bin/cmake']
+pkgconfig = ['/home/petri/Wayland/fix_pkg_conf_sysroot.sh']
+#pkgconfig = ['meson.get_external_property('PKG_CONFIG')']
 exe_wrapper = '/usr/bin/qemu-aarch64-static'
+
 

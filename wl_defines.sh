@@ -15,8 +15,8 @@ export RANLIB="${TOOLCHAIN}/bin/${HOST}-ranlib"
 export STRIP="${TOOLCHAIN}/bin/${HOST}-strip"
 export CONFIGURE_FLAGS="--host=${HOST} --build=${BUILD}"
 export PKG_CONFIG_SYSROOT_DIR="${SYSROOT}"
-export PKG_CONFIG='/mnt/wsl/PHYSICALDRIVE0/petri/wayland/wayland-build-tools/fix_pkg_conf_sysroot.sh'
-export PKG_CONFIG_PATH="${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
+export PKG_CONFIG_LIBDIR="${SYSROOT}/usr/lib/pkgconfig:${SYSROOT}/lib/pkgconfig:${SYSROOT}/usr/share/pkgconfig"
+export PYTHON="/usr/bin/python"
 #export PKG_CONFIG_PATH="${SYSROOT}/lib/pkgconfig"
 
 export INCLUDE_XWAYLAND=1
@@ -29,8 +29,9 @@ XWAYLAND=${WLROOT}/install/bin/Xwayland
 export DISTCHECK_CONFIGURE_FLAGS="--with-xserver-path=$XWAYLAND"
 
 export LD_LIBRARY_PATH=$WLD/lib
-export PKG_CONFIG_PATH=$WLD/lib/pkgconfig/:$WLD/share/pkgconfig/:$PKG_CONFIG_PATH
-export PATH=$WLD/bin:$PATH
+export PKG_CONFIG_LIBDIR=$WLD/lib/pkgconfig/:$WLD/share/pkgconfig/:$PKG_CONFIG_LIBDIR
+export PKG_CONFIG="${WLROOT}/fix_pkg_conf_sysroot.sh"
+#export PATH=$WLD/bin:$PATH
 export ACLOCAL_PATH="$WLD/share/aclocal"
 export ACLOCAL="aclocal -I $ACLOCAL_PATH"
 export MESON_CROSS_FILE="$HOME/Wayland/arm64.txt"

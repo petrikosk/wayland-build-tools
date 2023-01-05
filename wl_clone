@@ -56,8 +56,6 @@ clone_or_update git://anongit.freedesktop.org/git/mesa/drm
 clone_or_update git://anongit.freedesktop.org/xcb/proto
 clone_or_update git://anongit.freedesktop.org/xorg/util/macros
 clone_or_update git://anongit.freedesktop.org/xcb/libxcb
-clone_or_update git://anongit.freedesktop.org/xorg/proto/presentproto
-clone_or_update git://anongit.freedesktop.org/xorg/proto/dri3proto
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
 clone_or_update https://github.com/xkbcommon/libxkbcommon.git libxkbcommon
 clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa main
@@ -65,7 +63,7 @@ clone_or_update git://anongit.freedesktop.org/pixman
 clone_or_update git://anongit.freedesktop.org/cairo
 clone_or_update git://git.sv.gnu.org/libunwind
 clone_or_update git://anongit.freedesktop.org/libevdev
-clone_or_update git://anongit.freedesktop.org/wayland/wayland-protocols
+clone_or_update https://gitlab.freedesktop.org/wayland/wayland-protocols.git wayland-protocols 1.30
 clone_or_update git://git.code.sf.net/p/linuxwacom/libwacom
 clone_or_update git://anongit.freedesktop.org/wayland/libinput
 clone_or_update git://anongit.freedesktop.org/wayland/weston

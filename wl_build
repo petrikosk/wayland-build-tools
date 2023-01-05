@@ -1,6 +1,8 @@
 #!/bin/bash
 
 . $HOME/.config/wayland-build-tools/wl_defines.sh
+cp fix_pkg_conf_sysroot.sh $WLROOT
+cp arm64.txt $WLROOT
 
 if [ ! -e $WLROOT ]; then
 	exit 1
@@ -16,7 +18,7 @@ gen() {
 	echo $pkg
 	cd $WLROOT/$pkg
 	echo "./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*"
-	./autogen.sh $CONFIGURE_FLAGS --with-build-sysroot --prefix=$WLD $*
+	./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*
 	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
@@ -27,12 +29,13 @@ gen_meson() {
 	echo $pkg
 	cd $WLROOT/$pkg
 	echo "meson setup --cross-file $MESON_CROSS_FILE --prefix=$WLD $* build"
-	meson setup --cross-file $MESON_CROSS_FILE -Dprefix=$WLD $* build
+	meson setup --cross-file $MESON_CROSS_FILE \
+	-Dprefix=$WLD $* build
 	#meson setup --cross-file $MESON_CROSS_FILE $* build
 }
 
 compile() {
-	make -j16 && make install
+	make -j4 && make install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -61,8 +64,8 @@ mkdir -p $WLD/share/aclocal
 #gen wayland --with-host-scanner --disable-documentation
 #compile
 
-#gen wayland-protocols
-#compile
+#gen_meson wayland-protocols \
+#compile_meson
 
 #gen_meson drm #--disable-libkms
 #compile_meson
@@ -82,19 +85,13 @@ mkdir -p $WLD/share/aclocal
 #gen libxcb
 #compile
 
-#gen presentproto #DEPRECATED
-#compile
-
-#gen dri3proto #DEPRECATED
-#compile
-
 #gen libxshmfence
 #compile
 
 #gen libxkbcommon \
-	#--with-xkb-config-root=/usr/share/X11/xkb \
-	#--with-x-locale-root=/usr/share/X11/locale \
-	#--disable-x11
+#	--with-xkb-config-root=/usr/share/X11/xkb \
+#	--with-x-locale-root=/usr/share/X11/locale \
+#	--disable-x11
 gen_meson libxkbcommon \
     -Denable-x11=false \
     -Dxkb-config-root=/usr/share/X11/xkb \
