@@ -1,5 +1,5 @@
 #!/bin/bash
-
+launch_path="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 . $HOME/.config/wayland-build-tools/wl_defines.sh
 cp fix_pkg_conf_sysroot.sh $WLROOT
 cp arm64.txt $WLROOT
@@ -22,6 +22,18 @@ gen() {
 	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
+gen_autogen() {
+	pkg=$1
+	shift
+	echo
+	echo $pkg
+	cd $WLROOT/$pkg
+	echo "autoreconf --install"
+	autoreconf --install
+	echo "./configure $CONFIGURE_FLAGS --prefix=$WLD $*"
+	./configure $CONFIGURE_FLAGS --prefix=$WLD $*
+
+}
 gen_meson() {
 	pkg=$1
 	shift
@@ -35,7 +47,7 @@ gen_meson() {
 }
 
 compile() {
-	make -j4 && make install
+	make -j16 && make install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -64,7 +76,7 @@ mkdir -p $WLD/share/aclocal
 #gen wayland --with-host-scanner --disable-documentation
 #compile
 
-#gen_meson wayland-protocols \
+#gen_meson wayland-protocols
 #compile_meson
 
 #gen_meson drm #--disable-libkms
@@ -76,85 +88,72 @@ mkdir -p $WLD/share/aclocal
 #gen macros
 #compile
 
-#gen xorgproto
+#gen xorgproto \
+#	--enable-legacy
+
 #compile
 
 #gen libxau
 #compile
 
-#gen libxcb
-#compile
+#gen_meson drm
+#compile_meson
 
 #gen libxshmfence
 #compile
 
-#gen libxkbcommon \
-#	--with-xkb-config-root=/usr/share/X11/xkb \
-#	--with-x-locale-root=/usr/share/X11/locale \
-#	--disable-x11
-gen_meson libxkbcommon \
-    -Denable-x11=false \
-    -Dxkb-config-root=/usr/share/X11/xkb \
-    -Dx-locale-root=/usr/share/X11/locale
-compile_meson
+#gen_meson libxkbcommon \
+#    -Denable-x11=false \
+#    -Dxkb-config-root=/usr/share/X11/xkb \
+#    -Dx-locale-root=/usr/share/X11/locale
+#compile_meson
 
-llvm_drivers=swrast,nouveau,r300
-vga_pci=$(lspci | grep VGA | head -n1)
-vga_name=${vga_pci#*controller: }
-vga_manu=${vga_name%% *}
-if [ "${vga_manu}" = "NVIDIA" ]; then
-	llvm_drivers=swrast,nouveau
-fi
+gen libxext \
+	--enable-malloc0returnsnull=no
+compile
 
-echo
-echo "mesa"
 cd $WLROOT/mesa
 git clean -xfd
-./autogen.sh --prefix=$WLD \
-	$CONFIGURE_FLAGS \
-	--enable-gles2 \
-	--with-egl-platforms=x11,wayland,drm \
-	--enable-gbm \
-	--enable-shared-glapi \
-	--disable-llvm-shared-libs \
-	--disable-dri3 \
-	--with-gallium-drivers=$llvm_drivers
-compile
+gen_meson mesa
+	--buildtype=release     \
+	-Dplatforms=x11,wayland \
+	-Dgallium-drivers=swrast  \
+	-Dvulkan-drivers=""     \
+	-Dvalgrind=disabled     \
+	-Dlibunwind=disabled 
+compile_meson
 
 
-gen pixman
-compile
+#gen pixman
+#compile
 
-gen cairo --enable-xcb --enable-gl
-compile
+#gen cairo --enable-xcb --enable-gl
+#compile
 
-echo
-echo "libunwind"
-cd $WLROOT/libunwind
-autoreconf -i
-./configure $CONFIGURE_FLAGS --prefix=$WLD
-compile
+#echo
+#echo "libunwind"
+#cd $WLROOT/libunwind
+#autoreconf -i
+#./configure $CONFIGURE_FLAGS --prefix=$WLD
+#compile
 
-gen libevdev
-compile
+#gen libevdev
+#compile
 
-gen wayland-protocols
-compile
+#gen wayland-protocols
+#compile
 
-gen libwacom
-compile
+#gen libwacom # For wacom tablets.
+#compile
 
-echo
-echo libinput
-cd $WLROOT/libinput
-rm -rf $WLROOT/libinput/builddir/
-mkdir $WLROOT/libinput/builddir/
-echo "meson --prefix=$WLD builddir/"
-meson --prefix=$WLD -Ddebug-gui=false builddir/
-ninja -C builddir/
-ninja -C builddir/ install
-# sudo udevadm hwdb --update
+#gen_autogen check
+#compile
 
+#cd $WLROOT/libinput
+#rm -rf $WLROOT/libinput/builddir/
+#mkdir $WLROOT/libinput/builddir/
+#gen_meson libinput \
+#	-Ddebug-gui=false
 
 if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = 32 ]; then
@@ -162,60 +161,58 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 		compile
 	fi
 
-	gen xproto
-	compile
+	
 
-	rm -rf $WLROOT/libepoxy/m4
-	gen libepoxy
-	compile
+	#gen libxtrans
+	#compile
 
-	gen glproto
-	compile
+	#gen libxdmcp # Generates -?-?-? into CFLAGS in makefile
+	#compile
 
-	gen xcmiscproto
-	compile
+	#cd $WLROOT/libx11/src/util
+	#patch < "${launch_path}/patches/libx11/src/util/makekeys.c.patch"
+	#patch < "${launch_path}/patches/libx11/src/util/Makefile.am.patch"
 
-	gen libxtrans
-	compile
+	#gen libx11 \
+	#	--enable-malloc0returnsnull=no \
+	#	--disable-static \
+	#	 --disable-dri2 \
+	#	 --with-driver=dri \
+	#	 --enable-malloc0returnsnull
+	#compile 
 
-	gen bigreqsproto
-	compile
+	#gen libxkbfile
+	#compile
 
-	gen xextproto
-	compile
+	#gen libfontenc
+	#compile
 
-	gen fontsproto
-	compile
+	#gen libXfont
+	#compile
 
-	gen videoproto
-	compile
+	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE on top of the file
+	# Otherwise, build fails
+	#gen xkbcomp
+	#compile
 
-	gen recordproto
-	compile
+	#gen util
+	#compile
 
-	gen resourceproto
-	compile
+	gen_meson libepoxy \
+		--buildtype=release
+	compile_meson
 
-	gen xf86driproto
-	compile
+	gen_meson xserver \
+		-Dbuilder_addr="petri@koskinen.info" \
+		-Dbuilder_string="PetriKoskinen" \
+		-Dglx=false \
+		-Dipv6=false \
 
-	gen randrproto
-	compile
-
-	gen libxkbfile
-	compile
-
-	gen libXfont
-	compile
-
-	echo
-	echo "xserver"
-	cd $WLROOT/xserver
-	./autogen.sh $CONFIGURE_FLAGS \
-		--prefix=$WLD --disable-docs --disable-devel-docs \
-		--enable-xwayland --disable-xorg --disable-xvfb --disable-xnest \
-		--disable-xquartz --disable-xwin
-	compile
+	#gen xserver \
+	#	--disable-docs --disable-devel-docs \
+	#	--enable-xwayland --disable-xorg --disable-xvfb --disable-xnest \
+	#	--disable-xquartz --disable-xwin
+	compile_meson
 
 	echo
 	echo "Paths"
@@ -226,6 +223,10 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ! -e $WLD/bin/xkbcomp ]; then
 		ln -s /usr/bin/xkbcomp $WLD/bin/
 	fi
+
+	
+
+	
 fi
 
 echo

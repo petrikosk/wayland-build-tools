@@ -6,47 +6,66 @@ set -e
 
 mangle_pkg_config_result() {
 
-    local OPTIND o a neednewline
-    while getopts ":l:L:I:D:W:v:" o; do
+    local OPTIND o a neednewline nline
+    nline=$'\n'
+    while getopts ":l:L:I:D:W:v:i:" o; do
                     
         case "${o}" in
              L | I )
                 if [[ -e "${OPTARG}" ]] 
                 then 
-                  echo -n "-${o}${OPTARG} " 
+                  RET="${RET}-${o}${OPTARG} " 
+                  #echo -n "-${o}${OPTARG} " 
                 else
-                  echo -n "-${o}${OPTARG##$PKG_CONFIG_SYSROOT_DIR} "
+                  RET="${RET}-${o}${OPTARG##$PKG_CONFIG_SYSROOT_DIR} "
+                  #echo -n "-${o}${OPTARG##$PKG_CONFIG_SYSROOT_DIR} "
                 fi
                 neednewline=1
                 ;;
             l | D | W )
-                echo -n "-${o}${OPTARG} "
+                RET="${RET}-${o}${OPTARG} "  
+                #RET="$@ "
                 neednewline=1
                 ;;
             v )
                 if [[ -e "${OPTARG}" ]] 
-                then 
-                  echo -n "${OPTARG} " 
+                then
+                  RET="${RET}${OPTARG} "
                 else
-                  echo -n "${OPTARG##$PKG_CONFIG_SYSROOT_DIR}"
+                  RET="${RET}${OPTARG##$PKG_CONFIG_SYSROOT_DIR}"
                 fi
                 neednewline=1
                 ;;
+            i )
+                RET="$@ "
+                neednewline=1
+                ;;
             *)
-                echo -n "-${o}"
+                RET="${RET}-${o}"
                 neednewline=1
         esac
     done
     shift $((OPTIND-1))
-    if [[ $neednewline -ne 0 ]] ; then echo ; fi
+    if [[ $neednewline -ne 0 ]] ; then RET="${RET}${nline}" ; fi
 }
 
-if [[ "$1" == *"version"* ]] ; then exec pkg-config "$@"; fi
+logfile="/tmp/pkg.log"
+echo "args: $@" >> $logfile
+
+if [[ "$1" == *"version"* || "$1" == *"help"* ]] ; then 
+    string=$(pkg-config "$@")
+    ret=$?
+    echo "output: ${string}" >> $logfile
+    echo $string
+    exit ${ret}
+fi
 
 string=$(pkg-config "$@")
 ret=$?
-if [[ $ret -ne 0 ]] ; then echo $string; exit $ret ; fi
+if [[ ${RET} -ne 0 ]] ; then echo "output: ${string}" >> $logfile >> $logfile; echo $string; exit ${ret} ; fi
 
-if [[ "x$1" == "x--variable"* ]] ; then string="-v $string";
+if [[ "$@" == *"--variable"* ]] ; then string="-v $string";
 fi
 mangle_pkg_config_result $string
+echo ${RET}
+echo "output: ${RET}" >> $logfile

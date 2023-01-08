@@ -1,0 +1,40 @@
+Index: lib/X11/src/util/makekeys.c
+===================================================================
+RCS file: /cvs/xorg/lib/X11/src/util/makekeys.c,v
+retrieving revision 1.5
+diff -b -p -u -r1.5 makekeys.c
+--- lib/X11/src/util/makekeys.c	3 Jul 2005 07:00:56 -0000	1.5
++++ lib/X11/src/util/makekeys.c	5 Jun 2006 15:29:57 -0000
+@@ -42,7 +42,7 @@ char *malloc();
+ 
+ typedef unsigned long Signature;
+ 
+-#define KTNUM 3000
++#define KTNUM 4000
+ 
+ static struct info {
+     char	*name;
+@@ -156,6 +156,11 @@ main(int argc, char *argv[])
+ next1:	;
+     }
+ 
++    if (best_z == 0) {
++ 	fprintf(stderr, "makekeys: best_z not found for name"
++	  " ksnum=%i KTNUM=%i\n", ksnum, KTNUM);
++	exit(1);
++    }
+     z = best_z;
+     printf("#ifdef NEEDKTABLE\n");
+     printf("const unsigned char _XkeyTable[] = {\n");
+@@ -236,6 +241,11 @@ skip1:	;
+ next2:	;
+     }
+ 
++    if (best_z == 0) {
++ 	fprintf(stderr, "makekeys: best_z not found for val"
++	  " ksnum=%i KTNUM=%i\n", ksnum, KTNUM);
++	exit(1);
++    }
+     z = best_z;
+     for (i = z; --i >= 0;)
+ 	offsets[i] = 0;

@@ -4,16 +4,6 @@ cpu_family = 'aarch64'
 cpu = 'aarch64'
 endian = 'little'
 
-#[built-in options]
-#c_args = ['-I/opt/fsl-imx-xwayland/4.14-sumo/sysroots/aarch64-poky-linux/usr/include']
-#cpp_args = []
-#objc_args = []
-#objcpp_args = []
-#c_link_args = ['-nostdlib', '-lpthread']
-#cpp_link_args = []
-#objc_link_args = []
-#objcpp_link_args = []
-
 [properties]
 pkg_config_path = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/lib/pkgconfig','/home/petri/Wayland/install/lib/pkgconfig','/home/petri/Wayland/install/share/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/lib/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/share/pkgconfig']
 sys_root = '/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot'
@@ -25,9 +15,9 @@ c = ['aarch64-linux-gnu-gcc']
 cpp = ['aarch64-linux-gnu-g++']
 ar = ['aarch64-linux-gnu-ar']
 strip = ['aarch64-linux-gnu-strip']
-cmake = ['/usr/bin/cmake']
+cmake = ['/snap/bin/cmake']
 pkgconfig = ['/home/petri/Wayland/fix_pkg_conf_sysroot.sh']
 #pkgconfig = ['meson.get_external_property('PKG_CONFIG')']
 exe_wrapper = '/usr/bin/qemu-aarch64-static'
-
+llvm-config = '/usr/bin/llvm-config'
 
