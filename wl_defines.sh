@@ -5,7 +5,7 @@ export CARCH="aarch64"
 export HOST="aarch64-linux-gnu"
 export BUILD="x86_64-linux-gnu"
 export PATH="${TOOLCHAIN}/bin:$PATH"
-export CFLAGS="-march=${ARCH} -std=gnu99 --sysroot=$SYSROOT -D_GNU_SOURCE"
+export CFLAGS="-march=${ARCH} --sysroot=$SYSROOT -D_GNU_SOURCE"
 export CXXFLAGS="${CFLAGS} --sysroot=$SYSROOT"
 export LDFLAGS="--sysroot=${SYSROOT} -L${SYSROOT}/usr/lib -L${SYSROOT}/lib"
 export CC="${TOOLCHAIN}/bin/${HOST}-gcc"
@@ -42,13 +42,13 @@ export ACLOCAL="aclocal -I $ACLOCAL_PATH"
 export MESON_CROSS_FILE="$HOME/Wayland/arm64.txt"
 export INCLUDE_XWAYLAND=TRUE
 
-export CMAKE_INSTALL_PREFIX=$WLD
-export CMAKE_BUILD_TYPE="Release"
-export LLVM_TARGETS_TO_BUILD=$CARCH
-export CMAKE_BUILD_TYPE="MinSizeRel"
-export CMAKE_CROSSCOMPILING="True"
-export LLVM_TARGET_ARCH="AArch64"
-export CMAKE_CXX_FLAGS="-march=${ARCH}"
+#export CMAKE_INSTALL_PREFIX=$WLD
+#export CMAKE_BUILD_TYPE="Release"
+#export LLVM_TARGETS_TO_BUILD=$CARCH
+#export CMAKE_BUILD_TYPE="MinSizeRel"
+#export CMAKE_CROSSCOMPILING="True"
+#export LLVM_TARGET_ARCH="AArch64"
+#export CMAKE_CXX_FLAGS="-march=${ARCH}"
 
 
 

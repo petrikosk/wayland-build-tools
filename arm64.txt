@@ -7,8 +7,7 @@ endian = 'little'
 [properties]
 pkg_config_path = ['/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/lib/pkgconfig','/home/petri/Wayland/install/lib/pkgconfig','/home/petri/Wayland/install/share/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/lib/pkgconfig','/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot/usr/share/pkgconfig']
 sys_root = '/mnt/work/rk3399/Linux/linux-sdk/buildroot/output/rockchip_rk3399/host/aarch64-buildroot-linux-gnu/sysroot'
-wayland_scanner ='/usr/bin/wayland-scanner'
-
+needs_exe_wrapper = true
 
 [binaries]
 c = ['aarch64-linux-gnu-gcc']
@@ -19,5 +18,4 @@ cmake = ['/snap/bin/cmake']
 pkgconfig = ['/home/petri/Wayland/fix_pkg_conf_sysroot.sh']
 #pkgconfig = ['meson.get_external_property('PKG_CONFIG')']
 exe_wrapper = '/usr/bin/qemu-aarch64-static'
-llvm-config = '/usr/bin/llvm-config'
-
+#llvm-config = '/usr/bin/llvm-config'

@@ -73,7 +73,14 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = "32" ]; then
 		clone_or_update git://anongit.freedesktop.org/xorg/lib/libxtrans
 	fi
-	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libx11.git libx11 stable
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libx11.git libx11 48487c4b9028e9eec5371742f51e1d64c2e17296
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxext.git libxext 67e82cc395f44faddd83ec3d0d21624fe91c6fc0
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxfixes.git libxfixes 6fe3bd64dd82f704ed91478acb4c99ab5c00be16
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxxf86vm.git libxxf86vm 7fe2d41f164d3015216c1079cc7fbce1eea90c98
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxrandr.git libxrandr 3387129532899eaeee3477a2d92fa662d7292a84
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxrender.git libxrender e5e23272394c90731debd7e18dd167e8c25b5c15
+	clone_or_update https://github.com/linux-pam/linux-pam.git linux-pam 
+	clone_or_update https://chromium.googlesource.com/webm/libwebp
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git libxdmcp master
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libfontenc.git libfontenc master
 	clone_or_update https://gitlab.freedesktop.org/xorg/app/xkbcomp.git xkbcomp master

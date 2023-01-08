@@ -22,6 +22,17 @@ gen() {
 	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
+gen_configure() {
+	pkg=$1
+	shift
+	echo
+	echo $pkg
+	cd $WLROOT/$pkg
+	echo "./configure $CONFIGURE_FLAGS --prefix=$WLD $*"
+	./configure $CONFIGURE_FLAGS --prefix=$WLD $*
+	#./autogen.sh $CONFIGURE_FLAGS $*
+}
+
 gen_autogen() {
 	pkg=$1
 	shift
@@ -108,20 +119,53 @@ mkdir -p $WLD/share/aclocal
 #    -Dx-locale-root=/usr/share/X11/locale
 #compile_meson
 
-gen libxext \
-	--enable-malloc0returnsnull=no
-compile
+#cd $WLROOT/libx11/src/util
+#	cd $WLROOT/libx11
+#	git clean -xfd
+#	mkdir -p build_util
+#	pushd build_util
+#	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' ../autogen.sh
+#	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' make -C ../src/util makekeys
+#	popd
+#	rm config.guess
+#	gen libx11 \
+#		--enable-malloc0returnsnull=no \
+#		--disable-static \
+#		 --disable-dri2 \
+#		 --with-driver=dri \
+#		 --enable-malloc0returnsnull
+#	compile 
+#exit
 
-cd $WLROOT/mesa
-git clean -xfd
-gen_meson mesa
-	--buildtype=release     \
-	-Dplatforms=x11,wayland \
-	-Dgallium-drivers=swrast  \
-	-Dvulkan-drivers=""     \
-	-Dvalgrind=disabled     \
-	-Dlibunwind=disabled 
-compile_meson
+#gen libxext \
+#	--enable-malloc0returnsnull=no
+#compile
+
+#gen libxfixes
+#compile
+
+#gen libxxf86vm \
+#	--enable-malloc0returnsnull=no
+#compile
+
+#gen libxrender \
+#	--enable-malloc0returnsnull=no
+#compile
+
+#gen libxrandr \
+#	--enable-malloc0returnsnull=no
+#compile
+
+#cd $WLROOT/mesa
+#git clean -xfd
+#gen_meson mesa \
+#	--buildtype=release     \
+#	-Dplatforms=x11,wayland \
+#	-Dgallium-drivers=auto \
+#	-Dvulkan-drivers=""     \
+#	-Dvalgrind=disabled     \
+#	-Dlibunwind=disabled 
+#compile_meson
 
 
 #gen pixman
@@ -169,17 +213,7 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	#gen libxdmcp # Generates -?-?-? into CFLAGS in makefile
 	#compile
 
-	#cd $WLROOT/libx11/src/util
-	#patch < "${launch_path}/patches/libx11/src/util/makekeys.c.patch"
-	#patch < "${launch_path}/patches/libx11/src/util/Makefile.am.patch"
-
-	#gen libx11 \
-	#	--enable-malloc0returnsnull=no \
-	#	--disable-static \
-	#	 --disable-dri2 \
-	#	 --with-driver=dri \
-	#	 --enable-malloc0returnsnull
-	#compile 
+	
 
 	#gen libxkbfile
 	#compile
@@ -198,21 +232,21 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	#gen util
 	#compile
 
-	gen_meson libepoxy \
-		--buildtype=release
-	compile_meson
+	#gen_meson libepoxy \
+	#	--buildtype=release
+	#compile_meson
 
-	gen_meson xserver \
-		-Dbuilder_addr="petri@koskinen.info" \
-		-Dbuilder_string="PetriKoskinen" \
-		-Dglx=false \
-		-Dipv6=false \
+	#gen_meson xserver \
+	#	-Dbuilder_addr="petri@koskinen.info" \
+	#	-Dbuilder_string="PetriKoskinen" \
+	#	-Dglx=false \
+#		-Dipv6=false \
 
-	#gen xserver \
-	#	--disable-docs --disable-devel-docs \
-	#	--enable-xwayland --disable-xorg --disable-xvfb --disable-xnest \
-	#	--disable-xquartz --disable-xwin
-	compile_meson
+	#gen_meson xserver \
+#		--buildtype=release \
+#		-Dxvfb=false \
+#		-Dxwayland-path=$WLD/bin/Xwayland 
+#	compile_meson
 
 	echo
 	echo "Paths"
@@ -229,24 +263,27 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	
 fi
 
-echo
-echo "weston"
-cd $WLROOT/weston
-git clean -xfd
-./autogen.sh $CONFIGURE_FLAGS \
-	--prefix=$WLD \
-	--with-cairo=image \
-	--with-xserver-path=$WLD/bin/Xwayland \
-	--enable-setuid-install=no \
-	--enable-clients \
-	--enable-headless-compositor \
-	--enable-demo-clients-install
-compile
-#distcheck
+#gen_configure libwebp
+#compile
+
+#gen_configure linux-pam \
+#	--disable-doc
+#compile
+
+gen_meson weston \
+	-Dxwayland-path=$WLD/bin/Xwayland \
+	-Dsystemd=false \
+	-Dremoting=false \
+	-Dpipewire=false \
+	-Dlauncher-logind=false \
+	-Ddoc=false
+compile_meson
+
+
 
 # Set up config file if it isn't there already
-if [ ! -e $HOME/.config/weston.ini ]; then
-	cp weston.ini $HOME/.config/
-fi
+#if [ ! -e $HOME/.config/weston.ini ]; then
+#	cp weston.ini $HOME/.config/
+#fi
 
 cd $WLROOT
