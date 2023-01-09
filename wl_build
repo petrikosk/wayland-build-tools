@@ -17,8 +17,8 @@ gen() {
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
-	echo "./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*"
-	./autogen.sh $CONFIGURE_FLAGS --prefix=$WLD $*
+	echo "./autogen.sh $CONFIGURE_FLAGS --prefix=$PREFIX $*"
+	./autogen.sh $CONFIGURE_FLAGS --prefix=$PREFIX $*
 	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
@@ -28,8 +28,8 @@ gen_configure() {
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
-	echo "./configure $CONFIGURE_FLAGS --prefix=$WLD $*"
-	./configure $CONFIGURE_FLAGS --prefix=$WLD $*
+	echo "./configure $CONFIGURE_FLAGS --prefix=$PREFIX $*"
+	./configure $CONFIGURE_FLAGS --prefix=$PREFIX $*
 	#./autogen.sh $CONFIGURE_FLAGS $*
 }
 
@@ -41,8 +41,8 @@ gen_autogen() {
 	cd $WLROOT/$pkg
 	echo "autoreconf --install"
 	autoreconf --install
-	echo "./configure $CONFIGURE_FLAGS --prefix=$WLD $*"
-	./configure $CONFIGURE_FLAGS --prefix=$WLD $*
+	echo "./configure $CONFIGURE_FLAGS --prefix=$PREFIX $*"
+	./configure $CONFIGURE_FLAGS --prefix=$PREFIX $*
 
 }
 gen_meson() {
@@ -51,14 +51,18 @@ gen_meson() {
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
-	echo "meson setup --cross-file $MESON_CROSS_FILE --prefix=$WLD $* build"
+	rm -rf build
+	echo "meson setup --cross-file $MESON_CROSS_FILE -Dprefix=$PREFIX $* build"
 	meson setup --cross-file $MESON_CROSS_FILE \
-	-Dprefix=$WLD $* build
+	-Dprefix=$PREFIX $* build
 	#meson setup --cross-file $MESON_CROSS_FILE $* build
 }
 
 compile() {
-	make -j16 && make install
+	args=$1
+	make $1 -j16
+	make DESTDIR=$SYSROOT install
+	make DESTDIR=$WLD install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -66,7 +70,8 @@ compile() {
 }
 
 compile_meson() {
-	ninja -C build/ install
+	DESTDIR=$SYSROOT ninja -C build/ install
+	DESTDIR=$WLD ninja -C build/ install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -84,120 +89,121 @@ distcheck() {
 
 mkdir -p $WLD/share/aclocal
 
-#gen wayland --with-host-scanner --disable-documentation
-#compile
+gen wayland --with-host-scanner --disable-documentation
+compile
 
-#gen_meson wayland-protocols
-#compile_meson
+gen wayland-protocols
+compile
 
-#gen_meson drm #--disable-libkms
-#compile_meson
+gen proto
+compile
 
-#gen proto
-#compile
+gen macros
+compile
 
-#gen macros
-#compile
+gen xorgproto \
+	--enable-legacy
 
-#gen xorgproto \
-#	--enable-legacy
+compile
 
-#compile
+gen libxau
+compile
 
-#gen libxau
-#compile
+gen libxshmfence
+compile
 
-#gen_meson drm
-#compile_meson
+gen_meson libxkbcommon \
+    -Denable-x11=false \
+    -Dxkb-config-root=/usr/share/X11/xkb \
+    -Dx-locale-root=/usr/share/X11/locale
+compile_meson
 
-#gen libxshmfence
-#compile
+gen libxtrans
+	compile
 
-#gen_meson libxkbcommon \
-#    -Denable-x11=false \
-#    -Dxkb-config-root=/usr/share/X11/xkb \
-#    -Dx-locale-root=/usr/share/X11/locale
-#compile_meson
+gen libxcb
+compile
 
-#cd $WLROOT/libx11/src/util
-#	cd $WLROOT/libx11
-#	git clean -xfd
-#	mkdir -p build_util
-#	pushd build_util
-#	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' ../autogen.sh
-#	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' make -C ../src/util makekeys
-#	popd
-#	rm config.guess
-#	gen libx11 \
-#		--enable-malloc0returnsnull=no \
-#		--disable-static \
-#		 --disable-dri2 \
-#		 --with-driver=dri \
-#		 --enable-malloc0returnsnull
-#	compile 
-#exit
+cd $WLROOT/libx11/src/util
+	cd $WLROOT/libx11
+	git clean -xfd
+	mkdir -p build_util
+	pushd build_util
+	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' ../autogen.sh
+	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' make -C ../src/util makekeys
+	popd
+	rm config.guess
+	gen libx11 \
+		--enable-malloc0returnsnull=no \
+		--disable-static \
+		 --disable-dri2 \
+		 --with-driver=dri \
+		 --enable-malloc0returnsnull
+	compile 
 
-#gen libxext \
-#	--enable-malloc0returnsnull=no
-#compile
+gen libxext \
+	--enable-malloc0returnsnull=no
+compile
 
-#gen libxfixes
-#compile
+gen libxfixes
+compile
 
-#gen libxxf86vm \
-#	--enable-malloc0returnsnull=no
-#compile
+gen libxxf86vm \
+	--enable-malloc0returnsnull=no
+compile
 
-#gen libxrender \
-#	--enable-malloc0returnsnull=no
-#compile
+gen libxrender \
+	--enable-malloc0returnsnull=no
+compile
 
-#gen libxrandr \
-#	--enable-malloc0returnsnull=no
-#compile
+gen libxrandr \
+	--enable-malloc0returnsnull=no
+compile
 
-#cd $WLROOT/mesa
-#git clean -xfd
-#gen_meson mesa \
-#	--buildtype=release     \
-#	-Dplatforms=x11,wayland \
-#	-Dgallium-drivers=auto \
-#	-Dvulkan-drivers=""     \
-#	-Dvalgrind=disabled     \
-#	-Dlibunwind=disabled 
-#compile_meson
+gen cairo --enable-xcb #--enable-gl
+compile
 
+gen_meson drm #--disable-libkms
+compile_meson
 
-#gen pixman
-#compile
+cd $WLROOT/mesa
+git clean -xfd
+gen_meson mesa \
+	--buildtype=release     \
+	-Dplatforms=x11,wayland \
+	-Dgallium-drivers=lima \
+	-Dtools=lima \
+	-Dglx=dri \
+	-Dvulkan-drivers=""     \
+	-Dvalgrind=disabled     \
+	-Dlibunwind=disabled 
+compile_meson
 
-#gen cairo --enable-xcb --enable-gl
-#compile
+gen pixman
+compile
 
-#echo
-#echo "libunwind"
-#cd $WLROOT/libunwind
+echo
+echo "libunwind"
+cd $WLROOT/libunwind
 #autoreconf -i
-#./configure $CONFIGURE_FLAGS --prefix=$WLD
-#compile
+./configure $CONFIGURE_FLAGS --prefix=$PREFIX
+compile
 
-#gen libevdev
-#compile
+gen libevdev
+compile
 
-#gen wayland-protocols
-#compile
+gen_meson libwacom # For wacom tablets.
+compile_meson
 
-#gen libwacom # For wacom tablets.
-#compile
+gen_autogen check
+compile
 
-#gen_autogen check
-#compile
-
-#cd $WLROOT/libinput
-#rm -rf $WLROOT/libinput/builddir/
-#mkdir $WLROOT/libinput/builddir/
-#gen_meson libinput \
-#	-Ddebug-gui=false
+cd $WLROOT/libinput
+rm -rf $WLROOT/libinput/builddir/
+mkdir $WLROOT/libinput/builddir/
+gen_meson libinput \
+	-Ddebug-gui=false \
+	-Ddocumentation=false
 
 if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = 32 ]; then
@@ -205,48 +211,36 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 		compile
 	fi
 
-	
+	gen libxdmcp
+	compile
 
-	#gen libxtrans
-	#compile
+	gen libxkbfile
+	compile
 
-	#gen libxdmcp # Generates -?-?-? into CFLAGS in makefile
-	#compile
+	gen libfontenc
+	compile
 
-	
+	gen libXfont
+	compile
 
-	#gen libxkbfile
-	#compile
+	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
+	# Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
+	gen xkbcomp
+	compile \
+		_GNU_SOURCE=1
 
-	#gen libfontenc
-	#compile
+	gen util
+	compile
 
-	#gen libXfont
-	#compile
+	gen_meson libepoxy \
+		--buildtype=release
+	compile_meson
 
-	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE on top of the file
-	# Otherwise, build fails
-	#gen xkbcomp
-	#compile
-
-	#gen util
-	#compile
-
-	#gen_meson libepoxy \
-	#	--buildtype=release
-	#compile_meson
-
-	#gen_meson xserver \
-	#	-Dbuilder_addr="petri@koskinen.info" \
-	#	-Dbuilder_string="PetriKoskinen" \
-	#	-Dglx=false \
-#		-Dipv6=false \
-
-	#gen_meson xserver \
-#		--buildtype=release \
-#		-Dxvfb=false \
-#		-Dxwayland-path=$WLD/bin/Xwayland 
-#	compile_meson
+	gen_meson xserver \
+		--buildtype=release \
+		-Dxvfb=false \
+		-Dxwayland-path=$PREFIX/bin/Xwayland 
+	compile_meson
 
 	echo
 	echo "Paths"
@@ -263,20 +257,34 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	
 fi
 
-#gen_configure libwebp
-#compile
+gen libwebp
+gen_configure libwebp
+compile
 
-#gen_configure linux-pam \
-#	--disable-doc
-#compile
+gen linux-pam
+gen_configure linux-pam \
+	--disable-doc
+compile
+
+gen_meson libva
+compile_meson
+
+gen libxcursor
+compile
 
 gen_meson weston \
 	-Dxwayland-path=$WLD/bin/Xwayland \
 	-Dsystemd=false \
+	-Dbackend-drm-screencast-vaapi=false \
 	-Dremoting=false \
 	-Dpipewire=false \
 	-Dlauncher-logind=false \
-	-Ddoc=false
+	-Ddoc=false \
+	-Dbackend-rdp=false \
+	-Dcolor-management-lcms=false \
+	-Dcolor-management-colord=false \
+	-Dshell-ivi=false \
+	-Ddemo-clients=false
 compile_meson
 
 

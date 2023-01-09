@@ -59,3 +59,6 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	sudo apt-get -y install libxfixes-dev
 	sudo apt-get -y install libxxf86vm-dev
 fi
+
+# For mesa build
+pip3 install mako libevdev pyudev pytest --user

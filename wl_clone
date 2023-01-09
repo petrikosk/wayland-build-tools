@@ -42,7 +42,7 @@ clone_or_update() {
 		echo "Error: Problem checking out master"
 		exit 1
 	fi
-	git pull
+	git pull origin $3
 	if [ $? != 0 ]; then
 		echo "Error: Could not pull from upstream"
 		exit 1
@@ -50,24 +50,62 @@ clone_or_update() {
 	cd ${WLROOT}
 }
 
+tarfile_download_extract() {
+	url=$1
+	folder=$2
+	filename="$(basename -- $url)"
+	extension="${filename##*.}"
+	echo $extension
+	cd ${WLROOT}
+	if [ $? != 0 ]; then
+		echo "Error: Could not cd to ${WLROOT}.  Does it exist?"
+        exit 1
+	fi
+	echo
+	if test -d "$folder"; then
+    	echo "folder ./$folder exists."
+	else
+		echo "filename ${filename}"
+		mkdir $folder
+		if [[ $extension == "xz" ]]; then
+			echo "wget -c $url -O - | tar -Jx -C $folder --strip-components=1"
+			wget -c $url -O - | tar -Jx -C $folder --strip-components=1
+		elif [[ $extension == "gz" ]]; then
+			echo "wget -c $url -O - | tar -xz -C $folder --strip-components=1"
+			wget -c $url -O - | tar -xz -C $folder --strip-components=1
+		fi
+	fi
+	
+	if [ $? != 0 ]; then
+		echo "Error: Problem downloading file / extracting archive"
+		rm -r $folder
+		exit 1
+	fi
+	
+
+	cd ${WLROOT}
+
+}
+
 clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxau.git libxau
-clone_or_update git://anongit.freedesktop.org/wayland/wayland wayland 1.14
-clone_or_update git://anongit.freedesktop.org/git/mesa/drm
+clone_or_update git://anongit.freedesktop.org/wayland/wayland wayland eb1339edd398b9f5328816931e585db4229aa132
+clone_or_update git://anongit.freedesktop.org/git/mesa/drm drm 56f81e6776c1c100c3f627b2c1feb9dcae2aad3c
 clone_or_update git://anongit.freedesktop.org/xcb/proto
 clone_or_update git://anongit.freedesktop.org/xorg/util/macros
 clone_or_update git://anongit.freedesktop.org/xcb/libxcb
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
-clone_or_update https://github.com/xkbcommon/libxkbcommon.git libxkbcommon
-clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa 17.2
+tarfile_download_extract https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz libxkbcommon
+clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa eef77e355a4c4a0810cea1bc618ad62aff3f4e17
 clone_or_update git://anongit.freedesktop.org/pixman
-clone_or_update git://anongit.freedesktop.org/cairo
-clone_or_update git://git.sv.gnu.org/libunwind
+clone_or_update git://anongit.freedesktop.org/cairo cairo 1.16
+tarfile_download_extract https://github.com/libunwind/libunwind/releases/download/v1.6.2/libunwind-1.6.2.tar.gz libunwind
 clone_or_update git://anongit.freedesktop.org/libevdev
-#clone_or_update https://gitlab.freedesktop.org/wayland/wayland-protocols.git wayland-protocols 1.21
-clone_or_update https://github.com/linuxwacom/libwacom.git libwacom master
+clone_or_update https://gitlab.freedesktop.org/wayland/wayland-protocols.git wayland-protocols 630fb089103a1d0eab1a684b853ab5c4d2b252aa
+tarfile_download_extract https://github.com/linuxwacom/libwacom/archive/refs/tags/libwacom-2.5.0.tar.gz libwacom
 clone_or_update git://anongit.freedesktop.org/wayland/libinput
 clone_or_update git://anongit.freedesktop.org/wayland/weston
 clone_or_update https://github.com/libcheck/check.git check master
+clone_or_update https://github.com/intel/libva.git libva v2.17-branch
 
 if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = "32" ]; then
@@ -80,7 +118,8 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxrandr.git libxrandr 3387129532899eaeee3477a2d92fa662d7292a84
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxrender.git libxrender e5e23272394c90731debd7e18dd167e8c25b5c15
 	clone_or_update https://github.com/linux-pam/linux-pam.git linux-pam 
-	clone_or_update https://chromium.googlesource.com/webm/libwebp
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxcursor.git libxcursor b84b5d100f193fda0630c4d6fa889cd3e05ca033
+	clone_or_update https://chromium.googlesource.com/webm/libwebp libwebp 1.3.0
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxdmcp.git libxdmcp master
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libfontenc.git libfontenc master
 	clone_or_update https://gitlab.freedesktop.org/xorg/app/xkbcomp.git xkbcomp master

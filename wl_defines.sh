@@ -5,7 +5,7 @@ export CARCH="aarch64"
 export HOST="aarch64-linux-gnu"
 export BUILD="x86_64-linux-gnu"
 export PATH="${TOOLCHAIN}/bin:$PATH"
-export CFLAGS="-march=${ARCH} --sysroot=$SYSROOT -D_GNU_SOURCE"
+export CFLAGS="-march=${ARCH} --sysroot=$SYSROOT -DEXIT_FAILURE=-1"
 export CXXFLAGS="${CFLAGS} --sysroot=$SYSROOT"
 export LDFLAGS="--sysroot=${SYSROOT} -L${SYSROOT}/usr/lib -L${SYSROOT}/lib"
 export CC="${TOOLCHAIN}/bin/${HOST}-gcc"
@@ -27,6 +27,8 @@ export PATH="${TOOLCHAIN}/bin:$PATH"
 export INCLUDE_XWAYLAND=1
 export WLROOT=$HOME/Wayland
 export WLD=$WLROOT/install   # change this to another location if you prefer
+export PREFIX=/usr
+
 
 export WL_BITS=64
 
@@ -34,8 +36,8 @@ XWAYLAND=${WLROOT}/install/bin/Xwayland
 export DISTCHECK_CONFIGURE_FLAGS="--with-xserver-path=$XWAYLAND"
 
 export LD_LIBRARY_PATH=$WLD/lib
-export PKG_CONFIG_LIBDIR=$WLD/lib/pkgconfig/:$WLD/share/pkgconfig/:$PKG_CONFIG_LIBDIR
-export PKG_CONFIG="${WLROOT}/fix_pkg_conf_sysroot.sh"
+#export PKG_CONFIG_LIBDIR=$WLD/lib/pkgconfig/:$WLD/share/pkgconfig/:$PKG_CONFIG_LIBDIR
+#export PKG_CONFIG="${WLROOT}/fix_pkg_conf_sysroot.sh"
 #export PATH=$WLD/bin:$PATH
 export ACLOCAL_PATH="$WLD/share/aclocal"
 export ACLOCAL="aclocal -I $ACLOCAL_PATH"
