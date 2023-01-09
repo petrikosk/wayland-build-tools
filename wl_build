@@ -71,7 +71,7 @@ compile() {
 
 compile_meson() {
 	DESTDIR=$SYSROOT ninja -C build/ install
-	DESTDIR=$WLD ninja -C build/ install
+	DESTDIR=$WLD/usr ninja -C build/ install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -223,11 +223,13 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	gen libXfont
 	compile
 
-	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
-	# Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
-	gen xkbcomp
-	compile \
-		_GNU_SOURCE=1
+	In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
+	Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
+	export CFLAGS="-D_GNU_SOURCE $CFLAGS"
+	gen xkbcomp \
+	compile
+	. $HOME/.config/wayland-build-tools/wl_defines.sh
+		
 
 	gen util
 	compile
@@ -244,12 +246,12 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 
 	echo
 	echo "Paths"
-	mkdir -p $WLD/share/X11/xkb/rules
-	if [ ! -e $WLD/share/X11/xkb/rules/evdev ]; then
-		ln -s /usr/share/X11/xkb/rules/evdev $WLD/share/X11/xkb/rules/
+	mkdir -p $WLD/$PREFIX/share/X11/xkb/rules
+	if [ ! -e $WLD/$PREFIX/share/X11/xkb/rules/evdev ]; then
+		ln -s $SYSROOT/usr/share/X11/xkb/rules/evdev $WLD/$PREFIX/share/X11/xkb/rules/
 	fi
-	if [ ! -e $WLD/bin/xkbcomp ]; then
-		ln -s /usr/bin/xkbcomp $WLD/bin/
+	if [ ! -e $WLD/$PREFIX/bin/xkbcomp ]; then
+		ln -s $SYSROOT/usr/bin/xkbcomp $WLD/$PREFIX/bin/
 	fi
 
 	
@@ -273,7 +275,7 @@ gen libxcursor
 compile
 
 gen_meson weston \
-	-Dxwayland-path=$WLD/bin/Xwayland \
+	-Dxwayland-path=$WLD$PREFIX/bin/Xwayland \
 	-Dsystemd=false \
 	-Dbackend-drm-screencast-vaapi=false \
 	-Dremoting=false \

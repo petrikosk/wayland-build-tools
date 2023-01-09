@@ -95,7 +95,7 @@ clone_or_update git://anongit.freedesktop.org/xorg/util/macros
 clone_or_update git://anongit.freedesktop.org/xcb/libxcb
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
 tarfile_download_extract https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz libxkbcommon
-clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa eef77e355a4c4a0810cea1bc618ad62aff3f4e17
+clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa 78c96ae5b6197c66c681b1825411d7a05f85f0a6
 clone_or_update git://anongit.freedesktop.org/pixman
 clone_or_update git://anongit.freedesktop.org/cairo cairo 1.16
 tarfile_download_extract https://github.com/libunwind/libunwind/releases/download/v1.6.2/libunwind-1.6.2.tar.gz libunwind

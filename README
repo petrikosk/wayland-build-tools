@@ -3,6 +3,7 @@ Wayland Build Tools
 Forked from git://anongit.freedesktop.org/wayland/wayland-build-tools
 Added aarch64 cross compilation data
 
+2023-01-09: All compiles OK
 2023-01-08: Everything works except weston
 
 
