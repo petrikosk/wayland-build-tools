@@ -23,23 +23,18 @@ export PATH="${TOOLCHAIN}/bin:$PATH"
 #export EXTRA_DEFS="-isystem ${SYSROOT}/usr/include" # Needed for vim build
 #export PKG_CONFIG_PATH="${SYSROOT}/lib/pkgconfig"
 
-
+export PREFIX=/usr
 export INCLUDE_XWAYLAND=1
 export WLROOT=$HOME/Wayland
 export WLD=$WLROOT/install   # change this to another location if you prefer
-export PREFIX=/usr
 
 
 export WL_BITS=64
-
-XWAYLAND=${WLROOT}/install/bin/Xwayland
 export DISTCHECK_CONFIGURE_FLAGS="--with-xserver-path=$XWAYLAND"
-
 export LD_LIBRARY_PATH=$WLD/lib
 #export PKG_CONFIG_LIBDIR=$WLD/lib/pkgconfig/:$WLD/share/pkgconfig/:$PKG_CONFIG_LIBDIR
 #export PKG_CONFIG="${WLROOT}/fix_pkg_conf_sysroot.sh"
-#export PATH=$WLD/bin:$PATH
-export ACLOCAL_PATH="$WLD/share/aclocal"
+export ACLOCAL_PATH="$SYSROOT/$PREFIX/share/aclocal"
 export ACLOCAL="aclocal -I $ACLOCAL_PATH"
 export MESON_CROSS_FILE="$HOME/Wayland/arm64.txt"
 export INCLUDE_XWAYLAND=TRUE

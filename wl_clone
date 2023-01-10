@@ -86,7 +86,7 @@ tarfile_download_extract() {
 	cd ${WLROOT}
 
 }
-
+tarfile_download_extract https://github.com/unicode-org/icu/archive/refs/tags/release-72-1.tar.gz libicu
 clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxau.git libxau
 clone_or_update git://anongit.freedesktop.org/wayland/wayland wayland eb1339edd398b9f5328816931e585db4229aa132
 clone_or_update git://anongit.freedesktop.org/git/mesa/drm drm 56f81e6776c1c100c3f627b2c1feb9dcae2aad3c
@@ -106,6 +106,7 @@ clone_or_update git://anongit.freedesktop.org/wayland/libinput
 clone_or_update git://anongit.freedesktop.org/wayland/weston
 clone_or_update https://github.com/libcheck/check.git check master
 clone_or_update https://github.com/intel/libva.git libva v2.17-branch
+clone_or_update https://gitlab.gnome.org/GNOME/pango.git pango 3d3f165e77178b630d7dc2b733e64af513c99f5f
 
 if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = "32" ]; then

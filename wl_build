@@ -2,6 +2,7 @@
 launch_path="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 . $HOME/.config/wayland-build-tools/wl_defines.sh
 cp fix_pkg_conf_sysroot.sh $WLROOT
+cp remove-la-files.sh $WLROOT
 cp arm64.txt $WLROOT
 
 if [ ! -e $WLROOT ]; then
@@ -14,6 +15,7 @@ set -e
 gen() {
 	pkg=$1
 	shift
+	$WLROOT/remove-la-files.sh
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
@@ -25,6 +27,7 @@ gen() {
 gen_configure() {
 	pkg=$1
 	shift
+	$WLROOT/remove-la-files.sh
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
@@ -36,6 +39,7 @@ gen_configure() {
 gen_autogen() {
 	pkg=$1
 	shift
+	$WLROOT/remove-la-files.sh
 	echo
 	echo $pkg
 	cd $WLROOT/$pkg
@@ -60,7 +64,7 @@ gen_meson() {
 
 compile() {
 	args=$1
-	make $1 -j16
+	make $1 -j$(nproc --all)
 	make DESTDIR=$SYSROOT install
 	make DESTDIR=$WLD install
 	if [ $? != 0 ]; then
@@ -71,7 +75,7 @@ compile() {
 
 compile_meson() {
 	DESTDIR=$SYSROOT ninja -C build/ install
-	DESTDIR=$WLD/usr ninja -C build/ install
+	DESTDIR=$WLD ninja -C build/ install
 	if [ $? != 0 ]; then
 		echo "Build Error.  Terminating"
 		exit
@@ -88,6 +92,20 @@ distcheck() {
 #       delete $WLD
 
 mkdir -p $WLD/share/aclocal
+
+echo
+echo libicu
+cd $WLROOT/libicu/icu4c/source
+mkdir -p "build_${BUILD}"
+pushd "build_${BUILD}"
+env -i HOME="$HOME" bash -l -c ../configure
+env -i HOME="$HOME" bash -l -c 'make -j$(nproc --all)'
+popd
+mkdir -p "build_${HOST}"
+pushd "build_${HOST}"
+../configure $CONFIGURE_FLAGS --prefix=$PREFIX --with-cross-build="$WLROOT/libicu/icu4c/source/build_${BUILD}"
+compile
+popd
 
 gen wayland --with-host-scanner --disable-documentation
 compile
@@ -125,21 +143,20 @@ gen libxcb
 compile
 
 cd $WLROOT/libx11/src/util
-	cd $WLROOT/libx11
-	git clean -xfd
-	mkdir -p build_util
-	pushd build_util
-	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' ../autogen.sh
-	CC='gcc' CFLAGS='-Wall -g -O0' LDFLAGS='' AM_CFLAGS='' AM_LDFLAGS='' make -C ../src/util makekeys
-	popd
-	rm config.guess
-	gen libx11 \
-		--enable-malloc0returnsnull=no \
-		--disable-static \
-		 --disable-dri2 \
-		 --with-driver=dri \
-		 --enable-malloc0returnsnull
-	compile 
+cd $WLROOT/libx11
+git clean -xfd
+mkdir -p build_util
+pushd build_util
+env -i HOME="$HOME" bash -l -c ../autogen.sh
+env -i HOME="$HOME" bash -l -c 'make -C ../src/util makekeys'
+popd
+rm config.guess
+gen libx11 \
+	--enable-malloc0returnsnull=no \
+	--disable-static \
+		--disable-dri2 \
+		--with-driver=dri 
+compile 
 
 gen libxext \
 	--enable-malloc0returnsnull=no
@@ -182,11 +199,7 @@ compile_meson
 gen pixman
 compile
 
-echo
-echo "libunwind"
-cd $WLROOT/libunwind
-#autoreconf -i
-./configure $CONFIGURE_FLAGS --prefix=$PREFIX
+gen_configure libunwind
 compile
 
 gen libevdev
@@ -223,13 +236,12 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	gen libXfont
 	compile
 
-	In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
-	Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
+	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
+	# Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
 	export CFLAGS="-D_GNU_SOURCE $CFLAGS"
 	gen xkbcomp \
 	compile
 	. $HOME/.config/wayland-build-tools/wl_defines.sh
-		
 
 	gen util
 	compile
@@ -253,9 +265,6 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ! -e $WLD/$PREFIX/bin/xkbcomp ]; then
 		ln -s $SYSROOT/usr/bin/xkbcomp $WLD/$PREFIX/bin/
 	fi
-
-	
-
 	
 fi
 
@@ -274,8 +283,11 @@ compile_meson
 gen libxcursor
 compile
 
+gen_meson pango
+compile_meson
+
 gen_meson weston \
-	-Dxwayland-path=$WLD$PREFIX/bin/Xwayland \
+	-Dxwayland-path=$PREFIX/bin/Xwayland \
 	-Dsystemd=false \
 	-Dbackend-drm-screencast-vaapi=false \
 	-Dremoting=false \
@@ -286,7 +298,7 @@ gen_meson weston \
 	-Dcolor-management-lcms=false \
 	-Dcolor-management-colord=false \
 	-Dshell-ivi=false \
-	-Ddemo-clients=false
+	-Ddemo-clients=true
 compile_meson
 
 

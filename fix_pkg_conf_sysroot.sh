@@ -64,7 +64,7 @@ string=$(pkg-config "$@")
 ret=$?
 if [[ ${RET} -ne 0 ]] ; then echo "output: ${string}" >> $logfile >> $logfile; echo $string; exit ${ret} ; fi
 
-if [[ "$@" == *"--variable"* ]] ; then string="-v $string";
+if [[ "$@" == *"--variable"* && -n $string ]] ; then string="-v $string";
 fi
 mangle_pkg_config_result $string
 echo ${RET}
