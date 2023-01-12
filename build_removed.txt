@@ -42,3 +42,7 @@ gen xorg-xserver \
 
 
 	compile_meson
+
+	gen_configure nettle \
+		--disable-openssl
+	compile

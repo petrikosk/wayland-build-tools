@@ -281,14 +281,12 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 
 	gen_meson xserver \
 		--buildtype=release \
+		-Dglx=false \
 		-Dxvfb=false \
 		-Dxwayland-path=$PREFIX/bin
 	compile_meson
 
-	gen_configure nettle \
-		--disable-openssl
-	compile
-
+	
  fi
 
 gen libwebp
