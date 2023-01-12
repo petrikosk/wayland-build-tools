@@ -95,7 +95,8 @@ clone_or_update git://anongit.freedesktop.org/xorg/util/macros
 clone_or_update git://anongit.freedesktop.org/xcb/libxcb
 clone_or_update git://anongit.freedesktop.org/xorg/lib/libxshmfence
 tarfile_download_extract https://xkbcommon.org/download/libxkbcommon-1.4.1.tar.xz libxkbcommon
-clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa 78c96ae5b6197c66c681b1825411d7a05f85f0a6
+#clone_or_update git://anongit.freedesktop.org/mesa/mesa mesa 78c96ae5b6197c66c681b1825411d7a05f85f0a6
+clone_or_update https://github.com/Txwv/rockchip-linux-libmali.git rockchip-linux-libmali master
 clone_or_update git://anongit.freedesktop.org/pixman
 clone_or_update git://anongit.freedesktop.org/cairo cairo 1.16
 tarfile_download_extract https://github.com/libunwind/libunwind/releases/download/v1.6.2/libunwind-1.6.2.tar.gz libunwind
@@ -112,6 +113,8 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = "32" ]; then
 		clone_or_update git://anongit.freedesktop.org/xorg/lib/libxtrans
 	fi
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libice.git libice master
+	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libsm.git libsm master
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libx11.git libx11 48487c4b9028e9eec5371742f51e1d64c2e17296
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxext.git libxext 67e82cc395f44faddd83ec3d0d21624fe91c6fc0
 	clone_or_update https://gitlab.freedesktop.org/xorg/lib/libxfixes.git libxfixes 6fe3bd64dd82f704ed91478acb4c99ab5c00be16

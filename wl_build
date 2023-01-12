@@ -91,7 +91,6 @@ distcheck() {
 # TODO: If it's been a while since we last ran successfully, then
 #       delete $WLD
 
-mkdir -p $WLD/share/aclocal
 
 echo
 echo libicu
@@ -181,19 +180,11 @@ gen cairo --enable-xcb #--enable-gl
 compile
 
 gen_meson drm #--disable-libkms
-compile_meson
+DESTDIR=$SYSROOT ninja -C build/ install
 
-cd $WLROOT/mesa
-git clean -xfd
-gen_meson mesa \
-	--buildtype=release     \
-	-Dplatforms=x11,wayland \
-	-Dgallium-drivers=lima \
-	-Dtools=lima \
-	-Dglx=dri \
-	-Dvulkan-drivers=""     \
-	-Dvalgrind=disabled     \
-	-Dlibunwind=disabled 
+gen_meson rockchip-linux-libmali \
+	-Dplatform=wayland
+	
 compile_meson
 
 gen pixman
@@ -217,6 +208,7 @@ mkdir $WLROOT/libinput/builddir/
 gen_meson libinput \
 	-Ddebug-gui=false \
 	-Ddocumentation=false
+compile_meson
 
 if [ ${INCLUDE_XWAYLAND} ]; then
 	if [ ${WL_BITS} = 32 ]; then
@@ -239,34 +231,35 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	# In xkbcomp: expr.c and geometry.c need #define _GNU_SOURCE.
 	# Otherwise, build fails. CFLAGS should have -D_GNU_SOURCE flag
 	export CFLAGS="-D_GNU_SOURCE $CFLAGS"
-	gen xkbcomp \
+	gen xkbcomp 
 	compile
 	. $HOME/.config/wayland-build-tools/wl_defines.sh
+
+	gen libice
+	compile
+
+	gen libsm
+	compile
+
+	gen_meson glmark2 \
+		-Dflavors=x11-glesv2
+	compile_meson
 
 	gen util
 	compile
 
 	gen_meson libepoxy \
-		--buildtype=release
+		--buildtype=release 
 	compile_meson
 
 	gen_meson xserver \
 		--buildtype=release \
 		-Dxvfb=false \
-		-Dxwayland-path=$PREFIX/bin/Xwayland 
+		-Dglx=false \
+		-Dxwayland-path=$PREFIX/bin
 	compile_meson
-
-	echo
-	echo "Paths"
-	mkdir -p $WLD/$PREFIX/share/X11/xkb/rules
-	if [ ! -e $WLD/$PREFIX/share/X11/xkb/rules/evdev ]; then
-		ln -s $SYSROOT/usr/share/X11/xkb/rules/evdev $WLD/$PREFIX/share/X11/xkb/rules/
-	fi
-	if [ ! -e $WLD/$PREFIX/bin/xkbcomp ]; then
-		ln -s $SYSROOT/usr/bin/xkbcomp $WLD/$PREFIX/bin/
-	fi
 	
-fi
+ fi
 
 gen libwebp
 gen_configure libwebp
@@ -298,14 +291,7 @@ gen_meson weston \
 	-Dcolor-management-lcms=false \
 	-Dcolor-management-colord=false \
 	-Dshell-ivi=false \
-	-Ddemo-clients=true
+	-Ddemo-clients=false
 compile_meson
-
-
-
-# Set up config file if it isn't there already
-#if [ ! -e $HOME/.config/weston.ini ]; then
-#	cp weston.ini $HOME/.config/
-#fi
 
 cd $WLROOT
