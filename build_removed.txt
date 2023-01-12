@@ -1,0 +1,44 @@
+gen xorg-xserver \
+		--disable-glx \
+		--enable-xwayland \
+		--disable-pciaccess \
+		--disable-xvfb \
+		--disable-linux-apm \
+		--disable-linux-acpi \
+		--disable-xorg \
+		--disable-xvmc \
+		--disable-dpms \
+		--disable-systemd-logind \
+		--disable-xnest \
+		--disable-xquartz \
+		--disable-libunwind \
+		--disable-mitshm \
+		--disable-xv \
+		--enable-glamor \
+		--without-doxygen \
+		--without-xmlto \
+		--without-fop 
+
+	compile
+
+
+	gen_meson xorg-xserver \
+		--buildtype=release \
+		-Dxorg=false \
+		-Dxwayland=true \
+		-Dxvfb=false \
+		-Dglx=false \
+		-Dxwin=false \
+		-Dlog_dir=/var/log/Xorg.log \
+		-Dxdmcp=false \
+		-Dxdm-auth-1=false \
+		-Dsecure-rpc=false \
+		-Dipv6=false \
+		-Dsystemd_logind=false \
+		-Ddpms=false \
+		-Dxvmc=false \
+		-Dlinux_apm=false \
+		-Dlinux_acpi=false 
+
+
+	compile_meson

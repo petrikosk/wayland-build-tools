@@ -179,11 +179,42 @@ compile
 gen cairo --enable-xcb #--enable-gl
 compile
 
-gen_meson drm #--disable-libkms
+gen_meson drm \
+	-Dintel=false \
+	-Dradeon=false \
+	-Damdgpu=false \
+	-Dnouveau=false \
+	-Dvmwgfx=false \
+	-Domap=false \
+	-Dexynos=false \
+	-Dfreedreno=false \
+	-Dtegra=false \
+	-Dvc4=false \
+	-Detnaviv=false \
+	-Dman-pages=false \
+	-Dfreedreno-kgsl=false \
+	-Dinstall-test-programs=true
+
 DESTDIR=$SYSROOT ninja -C build/ install
 
+# Mesa is needed for glx only (software rendering). Xserver build dependency.
+# Libmali takes care of EGL and GLES (hardware acceleration)
+gen_meson mesa \
+	--buildtype=release     \
+	-Dplatforms=x11,wayland \
+	-Dgallium-drivers= \
+	-Degl=disabled \
+	-Dgles1=disabled \
+	-Dgles2=disabled \
+	-Dgbm=disabled \
+	-Dglx=dri \
+	-Dvulkan-drivers=     \
+	-Dvalgrind=disabled     \
+	-Dlibunwind=disabled 
+compile_meson
+
 gen_meson rockchip-linux-libmali \
-	-Dplatform=wayland
+ 	-Dplatform=x11
 	
 compile_meson
 
@@ -241,10 +272,6 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	gen libsm
 	compile
 
-	gen_meson glmark2 \
-		-Dflavors=x11-glesv2
-	compile_meson
-
 	gen util
 	compile
 
@@ -255,10 +282,13 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 	gen_meson xserver \
 		--buildtype=release \
 		-Dxvfb=false \
-		-Dglx=false \
 		-Dxwayland-path=$PREFIX/bin
 	compile_meson
-	
+
+	gen_configure nettle \
+		--disable-openssl
+	compile
+
  fi
 
 gen libwebp
