@@ -179,23 +179,23 @@ compile
 gen cairo --enable-xcb #--enable-gl
 compile
 
-gen_meson drm \
-	-Dintel=false \
-	-Dradeon=false \
-	-Damdgpu=false \
-	-Dnouveau=false \
-	-Dvmwgfx=false \
-	-Domap=false \
-	-Dexynos=false \
-	-Dfreedreno=false \
-	-Dtegra=false \
-	-Dvc4=false \
-	-Detnaviv=false \
-	-Dman-pages=false \
-	-Dfreedreno-kgsl=false \
-	-Dinstall-test-programs=true
+# gen_meson drm \
+# 	-Dintel=false \
+# 	-Dradeon=false \
+# 	-Damdgpu=false \
+# 	-Dnouveau=false \
+# 	-Dvmwgfx=false \
+# 	-Domap=false \
+# 	-Dexynos=false \
+# 	-Dfreedreno=false \
+# 	-Dtegra=false \
+# 	-Dvc4=false \
+# 	-Detnaviv=false \
+# 	-Dman-pages=false \
+# 	-Dfreedreno-kgsl=false \
+# 	-Dinstall-test-programs=true
 
-DESTDIR=$SYSROOT ninja -C build/ install
+# DESTDIR=$SYSROOT ninja -C build/ install
 
 # Mesa is needed for glx only (software rendering). Xserver build dependency.
 # Libmali takes care of EGL and GLES (hardware acceleration)
@@ -213,10 +213,10 @@ gen_meson mesa \
 	-Dlibunwind=disabled 
 compile_meson
 
-gen_meson rockchip-linux-libmali \
- 	-Dplatform=x11
+# gen_meson rockchip-linux-libmali \
+#  	-Dplatform=x11
 	
-compile_meson
+# compile_meson
 
 gen pixman
 compile
@@ -281,13 +281,12 @@ if [ ${INCLUDE_XWAYLAND} ]; then
 
 	gen_meson xserver \
 		--buildtype=release \
+		-Dglx=false \
+		-Dglamor=true \
 		-Dxvfb=false \
 		-Dxwayland-path=$PREFIX/bin
 	compile_meson
 
-	gen_configure nettle \
-		--disable-openssl
-	compile
 
  fi
 
